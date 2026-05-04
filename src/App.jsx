@@ -50,12 +50,12 @@ export default function App() {
     setTimeout(() => setErrorMsg(''), 4000);
   };
 
-  // --- 1. ESCUCHAR CAMBIOS DE AUTH Y RECUPERAR SESIÓN ---
+ // --- 1. ESCUCHAR CAMBIOS DE AUTH Y RECUPERAR SESIÓN ---
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (userFound) => {
-      setUser(userFound);
-
+    const unsubscribe = onAuthStateChanged(auth, async (userFound) => {
       if (userFound) {
+        setUser(userFound);
+
         const savedPlayer = localStorage.getItem('trivia_player_session');
         const savedAdmin = localStorage.getItem('trivia_admin_session');
 
@@ -69,12 +69,20 @@ export default function App() {
           setCurrentRoomCode(data.roomCode);
           setView(data.view);
         }
+      } else {
+        // ESTA ES LA PIEZA QUE FALTA:
+        // Si no hay usuario, lo creamos anónimamente de inmediato
+        try {
+          await signInAnonymously(auth);
+        } catch (err) {
+          console.error("Error en auto-login:", err);
+          showError("Error al conectar con el servidor.");
+        }
       }
     });
 
     return () => unsubscribe();
   }, []);
-
   // --- 2. PROTECCIÓN CONTRA CIERRE O RECARGA ACCIDENTAL ---
   useEffect(() => {
     const handleBeforeUnload = (e) => {
