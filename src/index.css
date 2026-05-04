@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Evita el "pull-to-refresh" en móviles y tablets */
+html, body {
+  overscroll-behavior-y: contain;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
